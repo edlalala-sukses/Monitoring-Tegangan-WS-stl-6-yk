@@ -40,7 +40,7 @@ export default function Home() {
     <main className="flex flex-1 items-center justify-center bg-[#f4f5f7] p-6">
       <section className="w-full max-w-sm rounded-[22px] bg-white px-8 py-12 text-center shadow-[0_1px_2px_rgba(16,24,40,0.04),0_12px_32px_-12px_rgba(16,24,40,0.12)]">
         <h1 className="text-sm font-medium tracking-[0.14em] text-neutral-500 uppercase">
-          Battery Monitor
+          Output Voltage
         </h1>
 
         <p className="mt-8 text-6xl font-semibold tracking-tight text-neutral-900 tabular-nums">
