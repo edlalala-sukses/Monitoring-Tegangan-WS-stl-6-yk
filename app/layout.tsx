@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Battery Monitor",
+  title: "Monitoring Tegangan",
   description: "Monitoring tegangan baterai realtime",
 };
 
