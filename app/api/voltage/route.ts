@@ -27,31 +27,34 @@ export async function GET() {
       );
     }
 
-    // 2. Jika ESP32 menyala, lanjutkan mengambil data tegangan dari V0
-    const res = await fetch(
-      `https://${server}/external/api/get?token=${token}&v0`,
-      { cache: "no-store" }
-    );
+    // 2. Jika ESP32 menyala, ambil data tegangan (V0) dan frekuensi (V1) BERSAMAAN
+    const [resV0, resV1] = await Promise.all([
+      fetch(`https://${server}/external/api/get?token=${token}&v0`, { cache: "no-store" }),
+      fetch(`https://${server}/external/api/get?token=${token}&v1`, { cache: "no-store" })
+    ]);
 
-    if (!res.ok) {
+    if (!resV0.ok || !resV1.ok) {
       return Response.json(
-        { error: "Gagal mengambil data tegangan" },
+        { error: "Gagal mengambil data sensor" },
         { status: 502 }
       );
     }
 
-    const voltage = Number(await res.text());
+    // Mengonversi teks dari Blynk menjadi angka
+    const voltage = Number(await resV0.text());
+    const frequency = Number(await resV1.text());
 
-    if (!Number.isFinite(voltage)) {
+    if (!Number.isFinite(voltage) || !Number.isFinite(frequency)) {
       return Response.json(
-        { error: "Data tegangan tidak valid" },
+        { error: "Data sensor tidak valid" },
         { status: 502 }
       );
     }
 
-    // 3. Kirim data yang sukses terbaca ke dashboard
+    // 3. Kirim data yang sukses terbaca ke dashboard frontend
     return Response.json({
       voltage,
+      frequency, // Data frekuensi ditambahkan di sini
       updatedAt: new Date().toISOString(),
     });
   } catch {
