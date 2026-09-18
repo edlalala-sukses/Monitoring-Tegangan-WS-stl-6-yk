@@ -56,7 +56,7 @@ export default function Home() {
             Tegangan F/U Atas
           </h1>
           <p className="mt-2 text-4xl font-semibold tracking-tight text-neutral-900 tabular-nums">
-            {reading && reading.voltageAtas !== undefined ? reading.voltageAtas.toFixed(2) : "--.--"}
+            {reading && reading.voltageAtas !== undefined ? reading.voltageAtas.toFixed(3) : "--.--"}
             <span className="ml-2 text-xl font-medium text-neutral-400">V</span>
           </p>
         </div>
@@ -69,7 +69,7 @@ export default function Home() {
             Tegangan F/U Bawah
           </h1>
           <p className="mt-2 text-4xl font-semibold tracking-tight text-neutral-900 tabular-nums">
-            {reading && reading.voltageBawah !== undefined ? reading.voltageBawah.toFixed(2) : "--.--"}
+            {reading && reading.voltageBawah !== undefined ? reading.voltageBawah.toFixed(3) : "--.--"}
             <span className="ml-2 text-xl font-medium text-neutral-400">V</span>
           </p>
         </div>
