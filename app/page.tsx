@@ -37,7 +37,7 @@ export default function Home() {
     }
 
     poll();
-    const id = setInterval(poll, 2000);
+    const id = setInterval(poll, 500);
 
     return () => {
       cancelled = true;
