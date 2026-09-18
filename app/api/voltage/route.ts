@@ -12,55 +12,43 @@ export async function GET() {
   }
 
   try {
-    // 1. Pengecekan Status ESP32 (Menyala/Mati)
     const statusRes = await fetch(
       `https://${server}/external/api/isHardwareConnected?token=${token}`,
       { cache: "no-store" }
     );
     const isOnline = await statusRes.text();
 
-    // Jika ESP32 mati, paksa kembalikan error 502 agar indikator web menjadi merah
     if (isOnline !== "true") {
-      return Response.json(
-        { error: "Perangkat ESP32 Offline" },
-        { status: 502 }
-      );
+      return Response.json({ error: "Perangkat ESP32 Offline" }, { status: 502 });
     }
 
-    // 2. Jika ESP32 menyala, ambil data tegangan (V0) dan frekuensi (V1) BERSAMAAN
-    const [resV0, resV1] = await Promise.all([
+    // Mengambil data V0 (Atas), V1 (Frekuensi), dan V2 (Bawah) BERSAMAAN
+    const [resV0, resV1, resV2] = await Promise.all([
       fetch(`https://${server}/external/api/get?token=${token}&v0`, { cache: "no-store" }),
-      fetch(`https://${server}/external/api/get?token=${token}&v1`, { cache: "no-store" })
+      fetch(`https://${server}/external/api/get?token=${token}&v1`, { cache: "no-store" }),
+      fetch(`https://${server}/external/api/get?token=${token}&v2`, { cache: "no-store" })
     ]);
 
-    if (!resV0.ok || !resV1.ok) {
-      return Response.json(
-        { error: "Gagal mengambil data sensor" },
-        { status: 502 }
-      );
+    if (!resV0.ok || !resV1.ok || !resV2.ok) {
+      return Response.json({ error: "Gagal mengambil data sensor" }, { status: 502 });
     }
 
-    // Mengonversi teks dari Blynk menjadi angka
-    const voltage = Number(await resV0.text());
+    const voltageAtas = Number(await resV0.text());
     const frequency = Number(await resV1.text());
+    const voltageBawah = Number(await resV2.text());
 
-    if (!Number.isFinite(voltage) || !Number.isFinite(frequency)) {
-      return Response.json(
-        { error: "Data sensor tidak valid" },
-        { status: 502 }
-      );
+    if (!Number.isFinite(voltageAtas) || !Number.isFinite(frequency) || !Number.isFinite(voltageBawah)) {
+      return Response.json({ error: "Data sensor tidak valid" }, { status: 502 });
     }
 
-    // 3. Kirim data yang sukses terbaca ke dashboard frontend
+    // Mengirim 3 data sekaligus
     return Response.json({
-      voltage,
-      frequency, // Data frekuensi ditambahkan di sini
+      voltageAtas,
+      voltageBawah,
+      frequency,
       updatedAt: new Date().toISOString(),
     });
   } catch {
-    return Response.json(
-      { error: "Gagal menghubungi server Blynk" },
-      { status: 502 }
-    );
+    return Response.json({ error: "Gagal menghubungi server Blynk" }, { status: 502 });
   }
 }
